@@ -11,36 +11,46 @@ export default function Welcome() {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <View style={styles.content}>
-        {/* TODO: Add your app logo here */}
         <Image
           source={require("../assets/images/SchemeSeva.jpeg")}
           style={styles.logo}
+          resizeMode="contain"
         />
 
         <Text
-          variant="headlineMedium"
+          variant="displaySmall"
           style={[styles.title, { color: theme.colors.onBackground }]}
         >
-          Welcome to SchemeSeva
+          SchemeSeva
         </Text>
 
         <Text
           variant="bodyLarge"
           style={[styles.tagline, { color: theme.colors.onBackground }]}
         >
-          Your Guide to Government Schemes and Policies
+          Your Guide to Government Schemes
         </Text>
 
         <View style={styles.buttonContainer}>
           <Link href="/auth/signup" asChild>
-            <Button mode="contained" style={styles.button}>
-              Sign Up
+            <Button
+              mode="contained"
+              style={styles.button}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+            >
+              Get Started
             </Button>
           </Link>
 
           <Link href="/auth/login" asChild>
-            <Button mode="outlined" style={styles.button}>
-              Login
+            <Button
+              mode="outlined"
+              style={styles.button}
+              contentStyle={styles.buttonContent}
+              labelStyle={styles.buttonLabel}
+            >
+              Sign In
             </Button>
           </Link>
         </View>
@@ -57,30 +67,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 24,
   },
   logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
+    width: 80,
+    height: 80,
+    marginBottom: 24,
   },
   title: {
     marginBottom: 8,
     textAlign: "center",
     fontWeight: "bold",
+    letterSpacing: 0.5,
   },
   tagline: {
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: 48,
     opacity: 0.7,
-    fontWeight: "bold",
+    letterSpacing: 0.25,
   },
   buttonContainer: {
     width: "100%",
-    maxWidth: 300,
-    gap: 12,
+    maxWidth: 320,
+    gap: 16,
   },
   button: {
     width: "100%",
+    borderRadius: 12,
+  },
+  buttonContent: {
+    height: 52,
+  },
+  buttonLabel: {
+    fontSize: 16,
+    letterSpacing: 0.5,
   },
 });

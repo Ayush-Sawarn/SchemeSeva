@@ -54,19 +54,23 @@ export default function Dashboard() {
     <Card 
       style={styles.card}
       onPress={() => router.push(`/scheme/${item.id}`)}
+      mode="outlined"
     >
       <Card.Title
         title={item.title}
+        titleStyle={styles.cardTitle}
         subtitle={item.category}
+        subtitleStyle={styles.cardSubtitle}
         left={(props) => (
           <IconButton
             {...props}
             icon={item.icon_url || 'file-document-outline'}
+            size={24}
           />
         )}
       />
       <Card.Content>
-        <Text numberOfLines={2} style={styles.description}>
+        <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>
           {item.description}
         </Text>
       </Card.Content>
@@ -110,25 +114,40 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fafafa',
   },
   header: {
     flexDirection: 'row',
     padding: 16,
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   searchBar: {
     flex: 1,
+    elevation: 0,
+    backgroundColor: '#fff',
+    borderRadius: 12,
   },
   list: {
     padding: 16,
   },
   card: {
     marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.15,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    opacity: 0.7,
   },
   description: {
     opacity: 0.7,
+    lineHeight: 20,
   },
   centered: {
     flex: 1,
