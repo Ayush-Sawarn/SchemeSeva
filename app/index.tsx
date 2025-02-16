@@ -1,35 +1,25 @@
-import { StyleSheet, View, Image } from "react-native";
-import { Button, Text, useTheme } from "react-native-paper";
+import { StyleSheet, View, Image, Dimensions } from "react-native";
+import { Button, Text } from "react-native-paper";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const { width } = Dimensions.get("window");
+const BUTTON_SIZE = width * 0.1;
+
 export default function Welcome() {
-  const theme = useTheme();
-
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Image
-          source={require("../assets/images/SchemeSeva.jpeg")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-
-        <Text
-          variant="displaySmall"
-          style={[styles.title, { color: theme.colors.onBackground }]}
-        >
-          SchemeSeva
-        </Text>
-
-        <Text
-          variant="bodyLarge"
-          style={[styles.tagline, { color: theme.colors.onBackground }]}
-        >
-          Your Guide to Government Schemes
-        </Text>
+        <View style={styles.logoContainer}>
+          <Text style={styles.title}>
+            <Text style={styles.schemeText}>SCHEMESEVA</Text>
+          </Text>
+          <Image
+            source={require("../assets/images/SchemeSeva.jpeg")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
         <View style={styles.buttonContainer}>
           <Link href="/auth/signup" asChild>
@@ -37,20 +27,24 @@ export default function Welcome() {
               mode="contained"
               style={styles.button}
               contentStyle={styles.buttonContent}
+              buttonColor="#303030"
+              elevation={4}
               labelStyle={styles.buttonLabel}
             >
-              Get Started
+              SIGN{"\n"}UP
             </Button>
           </Link>
 
           <Link href="/auth/login" asChild>
             <Button
-              mode="outlined"
+              mode="contained"
               style={styles.button}
               contentStyle={styles.buttonContent}
+              buttonColor="#303030"
+              elevation={4}
               labelStyle={styles.buttonLabel}
             >
-              Sign In
+              LOG{"\n"}IN
             </Button>
           </Link>
         </View>
@@ -62,44 +56,58 @@ export default function Welcome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#E0E0E0",
   },
   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
+    padding: 16,
+    justifyContent: "space-between",
   },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 24,
+  logoContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 24,
     textAlign: "center",
-    fontWeight: "bold",
-    letterSpacing: 0.5,
   },
-  tagline: {
-    textAlign: "center",
-    marginBottom: 48,
-    opacity: 0.7,
-    letterSpacing: 0.25,
+  schemeText: {
+    fontSize: 56,
+    color: "#212121",
+    fontWeight: "900",
+    letterSpacing: 2,
+  },
+  sevaText: {
+    fontSize: 60,
+    color: "#212121",
+    fontWeight: "900",
+    letterSpacing: 3,
+  },
+  logo: {
+    width: 200,
+    height: 200,
   },
   buttonContainer: {
-    width: "100%",
-    maxWidth: 320,
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 16,
+    marginBottom: 32,
   },
   button: {
-    width: "100%",
-    borderRadius: 12,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    borderRadius: 8,
   },
   buttonContent: {
-    height: 52,
+    height: BUTTON_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonLabel: {
-    fontSize: 16,
-    letterSpacing: 0.5,
+    fontSize: 24,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    lineHeight: 28,
   },
 });

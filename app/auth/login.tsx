@@ -1,38 +1,27 @@
-import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput, HelperText } from "react-native-paper";
+import { useState } from "react";
+import { StyleSheet, View, Dimensions } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
 import { useAuth } from "../../contexts/auth";
+
+const { width } = Dimensions.get("window");
+const BUTTON_SIZE = width * 0.1;
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
     try {
-      setError("");
       setLoading(true);
-
-      // Basic validation
-      if (!email || !password) {
-        throw new Error("Please fill in all fields");
-      }
-
-      if (!email.includes("@")) {
-        throw new Error("Please enter a valid email address");
-      }
-
       await signIn(email, password);
       router.replace("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred during login"
-      );
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -41,57 +30,44 @@ export default function Login() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text variant="headlineMedium" style={styles.title}>
-          Welcome Back
-        </Text>
+        <Text style={styles.title}>Welcome Back</Text>
 
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          disabled={loading}
-        />
+        <View style={styles.form}>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={styles.input}
+            mode="flat"
+            theme={{
+              colors: { background: "#303030", onSurfaceVariant: "#FFFFFF" },
+            }}
+            textColor="#FFFFFF"
+          />
 
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? "eye-off" : "eye"}
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-          style={styles.input}
-          disabled={loading}
-        />
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+            mode="flat"
+            theme={{
+              colors: { background: "#303030", onSurfaceVariant: "#FFFFFF" },
+            }}
+            textColor="#FFFFFF"
+            onSubmitEditing={handleLogin}
+          />
 
-        {error ? (
-          <HelperText type="error" visible={!!error}>
-            {error}
-          </HelperText>
-        ) : null}
-
-        <Button
-          mode="contained"
-          onPress={handleLogin}
-          style={styles.button}
-          loading={loading}
-          disabled={loading}
-        >
-          Login
-        </Button>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+        </View>
 
         <View style={styles.footer}>
-          <Text variant="bodyMedium">Don't have an account? </Text>
+          <Text style={styles.footerText}>Don't have an account? </Text>
           <Link href="/auth/signup">
-            <Text variant="bodyMedium" style={styles.link}>
-              Sign Up
-            </Text>
+            <Text style={styles.link}>Sign Up</Text>
           </Link>
         </View>
       </View>
@@ -102,28 +78,43 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#E0E0E0",
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 16,
     justifyContent: "center",
   },
   title: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#212121",
     textAlign: "center",
     marginBottom: 32,
   },
-  input: {
-    marginBottom: 16,
+  form: {
+    gap: 16,
+    width: "80%",
+    alignSelf: "center",
   },
-  button: {
-    marginTop: 8,
+  input: {
+    backgroundColor: "#303030",
+    height: 48,
+  },
+  error: {
+    color: "#B00020",
+    textAlign: "center",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 16,
+    marginTop: 24,
+  },
+  footerText: {
+    color: "#212121",
   },
   link: {
-    color: "#1976D2",
+    color: "#303030",
+    fontWeight: "bold",
   },
 });

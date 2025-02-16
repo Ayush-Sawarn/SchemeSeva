@@ -1,17 +1,19 @@
-import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput, HelperText } from "react-native-paper";
+import { useState } from "react";
+import { StyleSheet, View, Dimensions } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
 import { useAuth } from "../../contexts/auth";
 
+const { width } = Dimensions.get("window");
+const BUTTON_SIZE = width * 0.1;
+
 export default function SignUp() {
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
 
   const handleSignUp = async () => {
@@ -19,12 +21,11 @@ export default function SignUp() {
       setError("");
       setLoading(true);
 
-      // Basic validation
-      if (!name || !password || !confirmPassword) {
+      if (!email || !password || !confirmPassword) {
         throw new Error("Please fill in all fields");
       }
 
-      if (!name.includes("@")) {
+      if (!email.includes("@")) {
         throw new Error("Please enter a valid email address");
       }
 
@@ -36,12 +37,10 @@ export default function SignUp() {
         throw new Error("Passwords do not match");
       }
 
-      await signUp(name, password);
+      await signUp(email, password);
       router.replace("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An error occurred during signup"
-      );
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -50,66 +49,54 @@ export default function SignUp() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text variant="headlineMedium" style={styles.title}>
-          Create Account
-        </Text>
+        <Text style={styles.title}>Create Account</Text>
 
-        <TextInput
-          label="Email"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          disabled={loading}
-        />
+        <View style={styles.form}>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={styles.input}
+          />
 
-        <TextInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-          right={
-            <TextInput.Icon
-              icon={showPassword ? "eye-off" : "eye"}
-              onPress={() => setShowPassword(!showPassword)}
-            />
-          }
-          style={styles.input}
-          disabled={loading}
-        />
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
 
-        <TextInput
-          label="Confirm Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!showPassword}
-          style={styles.input}
-          disabled={loading}
-        />
+          <TextInput
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            style={styles.input}
+          />
 
-        {error ? (
-          <HelperText type="error" visible={!!error}>
-            {error}
-          </HelperText>
-        ) : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Button
-          mode="contained"
-          onPress={handleSignUp}
-          style={styles.button}
-          loading={loading}
-          disabled={loading}
-        >
-          Sign Up
-        </Button>
+          <Button
+            mode="contained"
+            onPress={handleSignUp}
+            loading={loading}
+            disabled={loading}
+            style={styles.button}
+            buttonColor="#303030"
+            elevation={4}
+            labelStyle={styles.buttonLabel}
+          >
+            SIGN UP
+          </Button>
+        </View>
 
         <View style={styles.footer}>
-          <Text variant="bodyMedium">Already have an account? </Text>
+          <Text style={styles.footerText}>Already have an account? </Text>
           <Link href="/auth/login">
-            <Text variant="bodyMedium" style={styles.link}>
-              Login
-            </Text>
+            <Text style={styles.link}>Log In</Text>
           </Link>
         </View>
       </View>
@@ -120,28 +107,52 @@ export default function SignUp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#E0E0E0",
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 16,
     justifyContent: "center",
   },
   title: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#212121",
     textAlign: "center",
     marginBottom: 32,
   },
+  form: {
+    gap: 16,
+  },
   input: {
-    marginBottom: 16,
+    backgroundColor: "white",
+  },
+  error: {
+    color: "#B00020",
+    textAlign: "center",
   },
   button: {
-    marginTop: 8,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginTop: 16,
+  },
+  buttonLabel: {
+    fontSize: 24,
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 16,
+    marginTop: 24,
+  },
+  footerText: {
+    color: "#212121",
   },
   link: {
-    color: "#1976D2",
+    color: "#303030",
+    fontWeight: "bold",
   },
 });
