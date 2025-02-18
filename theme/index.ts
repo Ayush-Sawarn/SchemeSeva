@@ -18,12 +18,18 @@ export const darkTheme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#FFFFFF',
-    secondary: '#CCCCCC',
-    background: '#000000',
-    surface: '#121212',
+    primary: '#2E7D32', // Dark green
+    secondary: '#81C784', // Light green
+    background: '#121212',
+    surface: '#1E1E1E',
     text: '#FFFFFF',
     onBackground: '#FFFFFF',
     onSurface: '#FFFFFF',
+    elevation: {
+      level0: '#121212',
+      level1: '#1E1E1E',
+      level2: '#222222',
+      level3: '#242424',
+    },
   },
 }; 

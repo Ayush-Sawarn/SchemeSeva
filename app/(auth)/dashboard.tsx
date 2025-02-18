@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
-import { 
-  Text, 
-  Card, 
-  Searchbar, 
+import { useState, useEffect } from "react";
+import { StyleSheet, View, FlatList } from "react-native";
+import {
+  Text,
+  Card,
+  Searchbar,
   ActivityIndicator,
   IconButton,
-} from 'react-native-paper';
-import { router } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/auth';
+  useTheme,
+} from "react-native-paper";
+import { router } from "expo-router";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../contexts/auth";
 
 type Scheme = {
   id: string;
@@ -20,9 +21,10 @@ type Scheme = {
 };
 
 export default function Dashboard() {
+  const theme = useTheme();
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const { signOut } = useAuth();
 
   useEffect(() => {
@@ -32,79 +34,94 @@ export default function Dashboard() {
   const fetchSchemes = async () => {
     try {
       const { data, error } = await supabase
-        .from('schemes')
-        .select('*')
-        .order('title');
+        .from("schemes")
+        .select("*")
+        .order("title");
 
       if (error) throw error;
       setSchemes(data || []);
     } catch (error) {
-      console.error('Error fetching schemes:', error);
+      console.error("Error fetching schemes:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredSchemes = schemes.filter(scheme =>
-    scheme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    scheme.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const renderSchemeCard = ({ item }: { item: Scheme }) => (
-    <Card 
-      style={styles.card}
-      onPress={() => router.push(`/scheme/${item.id}`)}
-      mode="outlined"
-    >
-      <Card.Title
-        title={item.title}
-        titleStyle={styles.cardTitle}
-        subtitle={item.category}
-        subtitleStyle={styles.cardSubtitle}
-        left={(props) => (
-          <IconButton
-            {...props}
-            icon={item.icon_url || 'file-document-outline'}
-            size={24}
-          />
-        )}
-      />
-      <Card.Content>
-        <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>
-          {item.description}
-        </Text>
-      </Card.Content>
-    </Card>
+  const filteredSchemes = schemes.filter(
+    (scheme) =>
+      scheme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      scheme.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
+      <View
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" />
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
         <Searchbar
           placeholder="Search schemes..."
           onChangeText={setSearchQuery}
           value={searchQuery}
-          style={styles.searchBar}
+          style={[styles.searchBar, { backgroundColor: theme.colors.surface }]}
+          theme={{ colors: { elevation: { level3: theme.colors.surface } } }}
+          iconColor={theme.colors.onSurface}
+          placeholderTextColor={theme.colors.onSurfaceDisabled}
+          inputStyle={{ color: theme.colors.onSurface }}
         />
-        <IconButton
-          icon="logout"
-          onPress={signOut}
-          mode="contained"
-        />
+        <View style={styles.logoutContainer}>
+          <IconButton
+            icon="logout"
+            mode="contained"
+            onPress={signOut}
+            iconColor={theme.colors.onPrimary}
+            containerColor={theme.colors.primary}
+          />
+          <Text style={{ color: theme.colors.onSurface }}>Logout</Text>
+        </View>
       </View>
 
       <FlatList
         data={filteredSchemes}
-        renderItem={renderSchemeCard}
-        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <Card
+            style={styles.card}
+            onPress={() => router.push(`/scheme/${item.id}`)}
+            mode="elevated"
+          >
+            <Card.Title
+              title={item.title}
+              titleStyle={styles.cardTitle}
+              subtitle={item.category}
+              subtitleStyle={styles.cardSubtitle}
+              left={(props) => (
+                <IconButton
+                  {...props}
+                  icon={item.icon_url || "file-document-outline"}
+                  size={30}
+                  iconColor={theme.colors.primary}
+                />
+              )}
+            />
+            <Card.Content>
+              <Text variant="bodyMedium" style={styles.description}>
+                {item.description}
+              </Text>
+            </Card.Content>
+          </Card>
+        )}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
       />
     </View>
@@ -114,19 +131,21 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 12,
   },
   searchBar: {
     flex: 1,
     elevation: 0,
-    backgroundColor: '#fff',
     borderRadius: 12,
+  },
+  logoutContainer: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   list: {
     padding: 16,
@@ -134,24 +153,28 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 16,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#1E1E1E",
+    elevation: 4,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFFFFF",
     letterSpacing: 0.15,
   },
   cardSubtitle: {
     fontSize: 14,
-    opacity: 0.7,
+    color: "#AAAAAA",
   },
   description: {
+    color: "#FFFFFF",
     opacity: 0.7,
     lineHeight: 20,
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#121212",
   },
-}); 
+});
