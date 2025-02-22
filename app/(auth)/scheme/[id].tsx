@@ -88,10 +88,6 @@ export default function SchemeDetails() {
           </View>
         </Card.Content>
 
-        <Card.Actions>
-          <Button mode="contained">Share</Button>
-          <Button mode="outlined">Bookmark</Button>
-        </Card.Actions>
       </Card>
     </ScrollView>
   );
