@@ -77,21 +77,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     backgroundColor: "#333333",
   },
-  textContainer: {
-    padding: 20,
-    backgroundColor: "rgba(0,0,0,0.8)",
-  },
-  mainText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginBottom: 8,
-  },
-  subText: {
-    fontSize: 16,
-    color: "#FFFFFF",
-    opacity: 0.8,
-  },
   buttonContainer: {
     position: "absolute",
     top: "50%",

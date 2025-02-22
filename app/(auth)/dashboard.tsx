@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import {
   Text,
   Card,
@@ -7,10 +13,12 @@ import {
   ActivityIndicator,
   IconButton,
   useTheme,
+  Button,
 } from "react-native-paper";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/auth";
+import ChatBot from "../ChatBot";
 
 type Scheme = {
   id: string;
@@ -26,6 +34,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { signOut } = useAuth();
+  const [isChatBotVisible, setChatBotVisible] = useState(false);
 
   useEffect(() => {
     fetchSchemes();
@@ -124,6 +133,22 @@ export default function Dashboard() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
       />
+
+      <TouchableOpacity
+        style={styles.chatIcon}
+        onPress={() => setChatBotVisible(true)}
+      >
+        <IconButton icon="chat" size={30} iconColor="#F4EFCA" />
+      </TouchableOpacity>
+
+      <Modal
+        visible={isChatBotVisible}
+        animationType="slide"
+        transparent={false}
+      >
+        <ChatBot />
+        <Button onPress={() => setChatBotVisible(false)}>Close</Button>
+      </Modal>
     </View>
   );
 }
@@ -176,5 +201,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#121212",
+  },
+  chatIcon: {
+    position: "absolute",
+    bottom: 30,
+    right: 30,
+    backgroundColor: "#F66435",
+    borderRadius: 30,
+    padding: 10,
+    elevation: 4,
   },
 });
