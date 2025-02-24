@@ -36,6 +36,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "DEEPSEEK_API_KEY": "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"
     }
   }
 }

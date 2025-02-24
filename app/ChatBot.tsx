@@ -8,18 +8,16 @@ const ChatBot = () => {
 
   const handleSend = async () => {
     try {
-      const res = await axios.post(
-        "https://api.deepseek.com",
-        {
-          message: input,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+      const res = await axios.post("http://localhost:5000/api/chat", {
+        messages: [
+          {
+            role: "user",
+            content: input,
           },
-        }
-      );
-      setResponse(res.data.reply);
+        ],
+      });
+
+      setResponse(res.data.choices[0].message.content);
     } catch (error) {
       console.error("Error fetching response:", error);
       setResponse("Sorry, I couldn't fetch the information.");
