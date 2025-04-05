@@ -18,7 +18,7 @@ import {
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/auth";
-import ChatBot from "../ChatBot";
+import ChatBot from "../components/ChatBot";
 
 type Scheme = {
   id: string;
@@ -138,16 +138,29 @@ export default function Dashboard() {
         style={styles.chatIcon}
         onPress={() => setChatBotVisible(true)}
       >
-        <IconButton icon="chat" size={30} iconColor="#F4EFCA" />
+        <IconButton
+          icon="chat"
+          size={30}
+          iconColor="#FFFFFF"
+          containerColor={theme.colors.primary}
+        />
       </TouchableOpacity>
 
       <Modal
         visible={isChatBotVisible}
         animationType="slide"
-        transparent={false}
+        onRequestClose={() => setChatBotVisible(false)}
       >
-        <ChatBot />
-        <Button onPress={() => setChatBotVisible(false)}>Close</Button>
+        <View style={styles.modalContainer}>
+          <ChatBot />
+          <Button
+            mode="contained"
+            onPress={() => setChatBotVisible(false)}
+            style={styles.closeButton}
+          >
+            Close
+          </Button>
+        </View>
       </Modal>
     </View>
   );
@@ -206,9 +219,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 30,
-    backgroundColor: "#F66435",
     borderRadius: 30,
-    padding: 10,
     elevation: 4,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#121212",
+  },
+  closeButton: {
+    margin: 16,
   },
 });
