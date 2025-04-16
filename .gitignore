@@ -43,3 +43,6 @@ config/env.ts
 # Supabase
 .env
 .env.local
+
+# Add this to your .gitignore file
+lib/supabaseConfig.js
