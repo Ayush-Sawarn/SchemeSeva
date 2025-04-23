@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { Text, Card, Button, ActivityIndicator } from 'react-native-paper';
+import { useEffect, useState, useRef } from 'react';
+import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
+import { Text, Card, ActivityIndicator } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../../lib/supabase';
+import { ResizeMode, Video } from 'expo-av';
+
+const { width } = Dimensions.get('window');
 
 type SchemeDetails = {
   id: string;
@@ -12,12 +15,15 @@ type SchemeDetails = {
   benefits: string;
   application_process: string;
   category: string;
+  video_url?: string;
 };
 
 export default function SchemeDetails() {
   const { id } = useLocalSearchParams();
   const [scheme, setScheme] = useState<SchemeDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const videoRef = useRef(null);
+  const [videoStatus, setVideoStatus] = useState({});
 
   useEffect(() => {
     fetchSchemeDetails();
@@ -58,6 +64,20 @@ export default function SchemeDetails() {
 
   return (
     <ScrollView style={styles.container}>
+      {scheme.video_url && (
+        <View style={styles.videoContainer}>
+          <Video
+            ref={videoRef}
+            style={styles.video}
+            source={{ uri: scheme.video_url }}
+            useNativeControls
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping={false}
+            onPlaybackStatusUpdate={status => setVideoStatus(() => status)}
+          />
+        </View>
+      )}
+      
       <Card style={styles.card}>
         <Card.Content>
           <Text variant="titleLarge" style={styles.title}>
@@ -87,7 +107,6 @@ export default function SchemeDetails() {
             <Text variant="bodyMedium">{scheme.application_process}</Text>
           </View>
         </Card.Content>
-
       </Card>
     </ScrollView>
   );
@@ -97,6 +116,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  videoContainer: {
+    width: width,
+    height: width * 0.56, // 16:9 aspect ratio
+    backgroundColor: '#000',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
   },
   card: {
     margin: 16,
@@ -117,4 +145,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-}); 
+});

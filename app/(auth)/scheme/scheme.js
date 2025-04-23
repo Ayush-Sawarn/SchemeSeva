@@ -11,7 +11,8 @@ const schemes = [
     eligibility_criteria: "1. Start-ups\n2. PACS(Primary Agricultural Credit Society\n3. Farmers and Agri Entrepreneurs\n4. APMC's(Agricultural Produce Market Committee)\n5. Groups { SHG's(Self Help Groups), FPO's (Farmers Producers Organization )}.",
     benefits: "1. Those who are eligible for this scheme they can take loan up to 2cr\n2. They will get interest subsidy of 3% and the maximum interest rate is 9%\n3. The maximum interest for any amount will be less than or equal to 9%. The maximum loan repayment tenure is 7 years and there will be moratorium period (EMI holiday) of 6 months to 2 year depending on the project.\n4. The maximum number of projects that can be taken are 25 and each of such projects will be eligible under the scheme for loan up-to ₹ 2 crore.",
     application_process: "1. Contact the bank and take consent from them.\n2. Apply through AIF portal (https://agriinfra.dac.gov.in/)\n3. After registered in the portal the is sent to PMU(Program Management Unit)\n4. Loan and Subsidy Disbursal will be provided",
-    category: "Agriculture"
+    category: "Agriculture",
+    video_url: "https://3final3.s3.eu-north-1.amazonaws.com/PKKKY_final.mp4"
   },
   {
     id: "2",
@@ -20,7 +21,8 @@ const schemes = [
     eligibility_criteria: "Farmers:\na) Should be resident of HP and engaged in agriculture.\nb) Small, marginal, and medium-scale farmers are prioritized.\nc) Cooperative farmer groups can apply for cluster based benefits",
     benefits: "1. Women Farmers and SC/ST farmers receive additional benefits.\n2. Preference given to those willing to adopt 100% organic farming.\n3. Financial assistence maximum upto Rs. 8000/- per natural farming is being provided for lining cattle sheds which would facilitate collection of cow dung.\n4. A subsidy of 50% is being provided for the purchase of desi cow limited to Rs. 25,000/- and additional Rs. 5000/- for the trasportation purpose.",
     application_process: "1. Go to the Portal:\n2. Visit: https://naturalfarming.hp.gov.in/\n3. Fill in the Registration Form",
-    category: "Agriculture"
+    category: "Agriculture",
+    video_url: "https://3final3.s3.eu-north-1.amazonaws.com/PKKKY_final.mp4"
   },
   {
     id: "3",
@@ -29,7 +31,8 @@ const schemes = [
     eligibility_criteria: "1. Applicants must be permanent residents of himachal pradesh\n2. Farmers should own agricultural land with in state\n3. Both indiviual farmers and group (such as water User Associations) are eligible.",
     benefits: "1. Up to 100% subsidy for small/marginal farmers.\n2. Irrigation to dry and remote farm areas.\n3. Encourages multiple cropping.\n4. Improves water use efficiency.",
     application_process: "1. Apply at the nearest Agriculture Department office.\n2. Submit land documents, Aadhaar, and water need statement.\n3. On-site survey and technical assessment.\n4. Project execution with financial support.\n5. Subsidy released post-completion.\nVisit: https://himachalforms.nic.in/panchayati-raj/yojanas.html",
-    category: "Irrigation"
+    category: "Irrigation",
+    video_url: "https://3final3.s3.eu-north-1.amazonaws.com/FIS_final.mp4"
   },
   {
     id: "4",
@@ -38,7 +41,8 @@ const schemes = [
     eligibility_criteria: "1. All registered farmers in HP.\n2. SC/ST and marginal farmers get priority.\n3. Farmer groups/cooperatives also eligible.",
     benefits: "1. 40–80% subsidy on machines like power tillers, weeders, etc.\n2. Availability of Custom Hiring Centres (CHCs).\n3. Easy access to modern equipment.\n4. Lowers long-term costs for farmers.",
     application_process: "1. Visit: https://himachalforms.nic.in/panchayati-raj/yojanas.html\n2. Visit your Block Agriculture Office.\n3. Submit Aadhaar, land, and bank details.\n4. Deposit your share; collect machine post-verification.\n5. CHCs can be approached if not buying directly.",
-    category: "Agriculture"
+    category: "Agriculture",
+    video_url: "https://3final3.s3.eu-north-1.amazonaws.com/FIS_final.mp4"
   }
 ];
 
