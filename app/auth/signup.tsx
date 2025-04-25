@@ -1,48 +1,181 @@
-import { useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Alert, Dimensions } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../contexts/auth";
+import { supabase } from "../../lib/supabase";
 
 const { width } = Dimensions.get("window");
 const BUTTON_SIZE = width * 0.1;
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const [step, setStep] = useState<"phone" | "otp" | "password">("phone");
+  const { signIn } = useAuth();
 
-  const handleSignUp = async () => {
+  const handleSendOtp = async () => {
+    if (!phone || phone.length !== 10) {
+      Alert.alert("Error", "Please enter a valid 10-digit phone number");
+      return;
+    }
+
+    setLoading(true);
     try {
-      setError("");
-      setLoading(true);
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: `+91${phone}`,
+      });
 
-      if (!email || !password || !confirmPassword) {
-        throw new Error("Please fill in all fields");
-      }
-
-      if (!email.includes("@")) {
-        throw new Error("Please enter a valid email address");
-      }
-
-      if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters");
-      }
-
-      if (password !== confirmPassword) {
-        throw new Error("Passwords do not match");
-      }
-
-      await signUp(email, password);
-      router.replace("/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (error) throw error;
+      setStep("otp");
+      Alert.alert("Success", "OTP sent successfully");
+    } catch (error: any) {
+      Alert.alert("Error", error?.message || "Failed to send OTP");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      Alert.alert("Error", "Please enter the 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: `+91${phone}`,
+        token: otp,
+        type: "sms",
+      });
+
+      if (error) throw error;
+      if (!data.session) throw new Error("Could not verify OTP.");
+
+      setStep("password");
+    } catch (error: any) {
+      Alert.alert("Error", error?.message || "Failed to verify OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetPassword = async () => {
+    if (!password || password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters long.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (updateError) throw updateError;
+
+      Alert.alert("Success", "Account created successfully!");
+      await signIn();
+      router.replace("/dashboard");
+    } catch (error: any) {
+      Alert.alert("Error", error?.message || "Failed to set password.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case "otp":
+        return (
+          <>
+            <TextInput
+              label="OTP"
+              value={otp}
+              onChangeText={setOtp}
+              keyboardType="number-pad"
+              maxLength={6}
+              style={styles.input}
+              textColor="#FFFFFF"
+            />
+            <Button
+              mode="contained"
+              onPress={handleVerifyOtp}
+              loading={loading}
+              style={styles.button}
+            >
+              Verify OTP
+            </Button>
+            <Button
+              onPress={() => setStep("phone")}
+              disabled={loading}
+              textColor="#555"
+            >
+              Back
+            </Button>
+          </>
+        );
+      case "password":
+        return (
+          <>
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+              textColor="#FFFFFF"
+            />
+            <TextInput
+              label="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              style={styles.input}
+              textColor="#FFFFFF"
+            />
+            <Button
+              mode="contained"
+              onPress={handleSetPassword}
+              loading={loading}
+              style={styles.button}
+            >
+              Set Password & Sign Up
+            </Button>
+          </>
+        );
+      case "phone":
+      default:
+        return (
+          <>
+            <TextInput
+              label="Phone Number (+91)"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              maxLength={10}
+              style={styles.input}
+              textColor="#FFFFFF"
+            />
+            <Button
+              mode="contained"
+              onPress={handleSendOtp}
+              loading={loading}
+              style={styles.button}
+            >
+              Send OTP
+            </Button>
+          </>
+        );
     }
   };
 
@@ -51,47 +184,7 @@ export default function SignUp() {
       <View style={styles.content}>
         <Text style={styles.title}>Create Account</Text>
 
-        <View style={styles.form}>
-          <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            style={styles.input}
-          />
-
-          <TextInput
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
-
-          <TextInput
-            label="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            style={styles.input}
-          />
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-
-          <Button
-            mode="contained"
-            onPress={handleSignUp}
-            loading={loading}
-            disabled={loading}
-            style={styles.button}
-            buttonColor="#303030"
-            elevation={4}
-            labelStyle={styles.buttonLabel}
-          >
-            SIGN UP
-          </Button>
-        </View>
+        <View style={styles.form}>{renderStep()}</View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account? </Text>
@@ -125,21 +218,21 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#000000",
+    color: "#FFFFFF",
   },
   error: {
     color: "#B00020",
     textAlign: "center",
   },
   button: {
-    width: BUTTON_SIZE,
-    height: BUTTON_SIZE,
+    paddingVertical: 8,
     borderRadius: 8,
     alignSelf: "center",
     marginTop: 16,
   },
   buttonLabel: {
-    fontSize: 24,
+    fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "bold",
   },

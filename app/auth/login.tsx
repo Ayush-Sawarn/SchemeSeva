@@ -1,27 +1,44 @@
 import { useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../contexts/auth";
-
-const { width } = Dimensions.get("window");
-const BUTTON_SIZE = width * 0.1;
+import { supabase } from "../../lib/supabase";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
+    if (!phone || phone.length !== 10) {
+      Alert.alert("Error", "Please enter a valid 10-digit phone number");
+      return;
+    }
+    if (!password) {
+      Alert.alert("Error", "Please enter your password");
+      return;
+    }
+
+    setLoading(true);
     try {
-      setLoading(true);
-      await signIn(email, password);
+      const { error } = await supabase.auth.signInWithPassword({
+        phone: `+91${phone}`,
+        password: password,
+      });
+
+      if (error) throw error;
+
+      await signIn();
       router.replace("/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+    } catch (error: any) {
+      if (error.message === "Invalid login credentials") {
+        Alert.alert("Error", "Invalid phone number or password.");
+      } else {
+        Alert.alert("Error", error?.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -34,17 +51,13 @@ export default function Login() {
 
         <View style={styles.form}>
           <TextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            label="Phone Number (+91)"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            maxLength={10}
             style={styles.input}
-            mode="flat"
-            theme={{
-              colors: { background: "#303030", onSurfaceVariant: "#FFFFFF" },
-            }}
-            textColor="#FFFFFF"
+            textColor="#000000"
           />
 
           <TextInput
@@ -53,15 +66,17 @@ export default function Login() {
             onChangeText={setPassword}
             secureTextEntry
             style={styles.input}
-            mode="flat"
-            theme={{
-              colors: { background: "#303030", onSurfaceVariant: "#FFFFFF" },
-            }}
-            textColor="#FFFFFF"
-            onSubmitEditing={handleLogin}
+            textColor="#000000"
           />
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            loading={loading}
+            style={styles.button}
+          >
+            Log In
+          </Button>
         </View>
 
         <View style={styles.footer}>
@@ -98,8 +113,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   input: {
-    backgroundColor: "#303030",
+    backgroundColor: "#FFFFFF",
     height: 48,
+    color: "#000000",
   },
   error: {
     color: "#B00020",
@@ -116,5 +132,9 @@ const styles = StyleSheet.create({
   link: {
     color: "#303030",
     fontWeight: "bold",
+  },
+  button: {
+    marginTop: 8,
+    paddingVertical: 8,
   },
 });
