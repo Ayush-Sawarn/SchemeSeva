@@ -5,6 +5,8 @@ import {
   FlatList,
   Modal,
   TouchableOpacity,
+  Image,
+  ScrollView,
 } from "react-native";
 import {
   Text,
@@ -20,47 +22,67 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/auth";
 import ChatBot from "../components/ChatBot";
 
-type Scheme = {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  icon_url?: string;
-};
+const categories = [
+  {
+    key: "agriculture",
+    label: "Agriculture,Rural & Environment",
+    image: require("../../assets/images/Agriculture.png"),
+    color: "#A3E635",
+  },
+  {
+    key: "banking",
+    label: "Banking,Financial Services and Insurance",
+    image: require("../../assets/images/Banking.png"),
+    color: "#FACC15",
+  },
+  {
+    key: "business",
+    label: "Business & Entrepreneurship",
+    image: require("../../assets/images/Business.png"),
+    color: "#38BDF8",
+  },
+  {
+    key: "education",
+    label: "Education & Learning",
+    image: require("../../assets/images/Education.png"),
+    color: "#F87171",
+  },
+  {
+    key: "health",
+    label: "Health & Wellness",
+    image: require("../../assets/images/Health.png"),
+    color: "#34D399",
+  },
+];
 
 export default function Dashboard() {
   const theme = useTheme();
-  const [schemes, setSchemes] = useState<Scheme[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { signOut } = useAuth();
   const [isChatBotVisible, setChatBotVisible] = useState(false);
 
   useEffect(() => {
-    fetchSchemes();
+    fetchCounts();
   }, []);
 
-  const fetchSchemes = async () => {
+  const fetchCounts = async () => {
     try {
-      const { data, error } = await supabase
-        .from("schemes")
-        .select("*")
-        .order("title");
-
+      // Fetch all schemes and count by category in JS
+      const { data, error } = await supabase.from("schemes").select("category");
       if (error) throw error;
-      setSchemes(data || []);
+      const countsObj: Record<string, number> = {};
+      (data as { category: string }[]).forEach((row) => {
+        countsObj[row.category] = (countsObj[row.category] || 0) + 1;
+      });
+      setCounts(countsObj);
     } catch (error) {
-      console.error("Error fetching schemes:", error);
+      console.error("Error fetching counts:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  const filteredSchemes = schemes.filter(
-    (scheme) =>
-      scheme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      scheme.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   if (loading) {
     return (
@@ -75,158 +97,95 @@ export default function Dashboard() {
   }
 
   return (
-    <View
+    <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={{ flexGrow: 1 }}
     >
-      <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-        <Searchbar
-          placeholder="Search schemes..."
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={[styles.searchBar, { backgroundColor: theme.colors.surface }]}
-          theme={{ colors: { elevation: { level3: theme.colors.surface } } }}
-          iconColor={theme.colors.onSurface}
-          placeholderTextColor={theme.colors.onSurfaceDisabled}
-          inputStyle={{ color: theme.colors.onSurface }}
-        />
-        <View style={styles.logoutContainer}>
-          <IconButton
-            icon="logout"
-            mode="contained"
-            onPress={signOut}
-            iconColor={theme.colors.onPrimary}
-            containerColor={theme.colors.primary}
-          />
-          <Text style={{ color: theme.colors.onSurface }}>Logout</Text>
-        </View>
+      <Text style={styles.heading}>Find schemes based{"\n"}on categories</Text>
+      <View style={styles.grid}>
+        {categories.map((cat) => (
+          <TouchableOpacity
+            key={cat.key}
+            style={styles.categoryCard}
+            onPress={() => {
+              if (cat.key === "agriculture") {
+                router.push("/scheme/Agriculture" as never);
+              } else if (cat.key === "banking") {
+                router.push("/scheme/Banking" as never);
+              } else if (cat.key === "business") {
+                router.push("/scheme/Business" as never);
+              } else if (cat.key === "education") {
+                router.push("/scheme/Education" as never);
+              } else if (cat.key === "health") {
+                router.push("/scheme/Health" as never);
+              }
+            }}
+          >
+            <Image source={cat.image} style={styles.categoryIcon} />
+            <Text style={[styles.count, { color: cat.color }]}>
+              {(counts[cat.label] || 0) + " Schemes"}
+            </Text>
+            <Text style={styles.categoryLabel}>{cat.label}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
-
-      <FlatList
-        data={filteredSchemes}
-        renderItem={({ item }) => (
-          <Card
-            style={styles.card}
-            onPress={() => router.push(`/scheme/${item.id}`)}
-            mode="elevated"
-          >
-            <Card.Title
-              title={item.title}
-              titleStyle={styles.cardTitle}
-              subtitle={item.category}
-              subtitleStyle={styles.cardSubtitle}
-              left={(props) => (
-                <IconButton
-                  {...props}
-                  icon={item.icon_url || "file-document-outline"}
-                  size={30}
-                  iconColor={theme.colors.primary}
-                />
-              )}
-            />
-            <Card.Content>
-              <Text variant="bodyMedium" style={styles.description}>
-                {item.description}
-              </Text>
-            </Card.Content>
-          </Card>
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-      />
-
-      <TouchableOpacity
-        style={styles.chatIcon}
-        onPress={() => setChatBotVisible(true)}
-      >
-        <IconButton
-          icon="chat"
-          size={30}
-          iconColor="#FFFFFF"
-          containerColor={theme.colors.primary}
-        />
-      </TouchableOpacity>
-
-      <Modal
-        visible={isChatBotVisible}
-        animationType="slide"
-        onRequestClose={() => setChatBotVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <ChatBot />
-          <Button
-            mode="contained"
-            onPress={() => setChatBotVisible(false)}
-            style={styles.closeButton}
-          >
-            Close
-          </Button>
-        </View>
-      </Modal>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 32,
+    backgroundColor: "#23262B",
   },
-  header: {
+  heading: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 50,
+    lineHeight: 38,
+  },
+  grid: {
     flexDirection: "row",
-    padding: 16,
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    alignItems: "flex-start",
+    paddingHorizontal: 8,
+    paddingBottom: 40,
+  },
+  categoryCard: {
+    width: "18%",
+    minWidth: 120,
     alignItems: "center",
-    gap: 12,
+    marginBottom: 30,
+    marginHorizontal: 15,
   },
-  searchBar: {
-    flex: 1,
-    elevation: 0,
-    borderRadius: 12,
+  categoryIcon: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
   },
-  logoutContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  list: {
-    padding: 16,
-  },
-  card: {
-    marginBottom: 16,
-    borderRadius: 12,
-    backgroundColor: "#1E1E1E",
-    elevation: 4,
-  },
-  cardTitle: {
+  count: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FFFFFF",
-    letterSpacing: 0.15,
+    marginBottom: 8,
+    fontFamily: "monospace",
   },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#AAAAAA",
-  },
-  description: {
-    color: "#FFFFFF",
-    opacity: 0.7,
-    lineHeight: 20,
+  categoryLabel: {
+    color: "#fff",
+    fontSize: 12,
+    textAlign: "center",
+    fontWeight: "400",
+    lineHeight: 24,
+    marginTop: 2,
+    marginBottom: 0,
+    fontFamily: "serif",
   },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
-  },
-  chatIcon: {
-    position: "absolute",
-    bottom: 30,
-    right: 30,
-    borderRadius: 30,
-    elevation: 4,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#121212",
-  },
-  closeButton: {
-    margin: 16,
   },
 });
