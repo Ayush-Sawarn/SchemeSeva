@@ -221,7 +221,7 @@ const schemes = [
         {
           id: 18,
           title: "Ayushman Bharat - PM-JAY (in Himachal Pradesh)",
-          description: "Government’s largest health insurance scheme for poor and vulnerable families.\nOffers cashless hospitalization up to Rs. 5 lakhs annually per family.\nCovers secondary and tertiary healthcare needs.\nBased on Socio-Economic Caste Census (SECC) 2011 database.\nReduces catastrophic out-of-pocket medical expenses for families.",
+          description: "Government's largest health insurance scheme for poor and vulnerable families.\nOffers cashless hospitalization up to Rs. 5 lakhs annually per family.\nCovers secondary and tertiary healthcare needs.\nBased on Socio-Economic Caste Census (SECC) 2011 database.\nReduces catastrophic out-of-pocket medical expenses for families.",
           eligibility_criteria: "Name in SECC 2011 beneficiary list.\nResident of Himachal Pradesh.\nNo need for enrollment if name exists in list.\nPriority to deprived rural families and urban workers.\nNo age, family size, or gender restrictions.",
           benefits: "Rs. 5 lakh per family per year for secondary and tertiary care hospitalization.\nCashless and paperless access to services.\nCovers pre and post-hospitalization costs.\nTreatment in public and empanelled private hospitals.\nCovers over 1,500 medical procedures.",
           application_process: "Verify eligibility on the PM-JAY portal or CSC.\nVisit nearby Empanelled hospital/CSC center.\nProvide Aadhaar and family documents.\nAvail health services free of cost.\nNo premium payment required.",
@@ -257,6 +257,16 @@ const schemes = [
           application_process: "Register pregnancy at nearest health centre (ANM/ASHA worker).\nSubmit documents like Aadhaar, BPL card.\nDeliver at government hospital.\nASHA helps in documentation.\nReceive cash incentive post-delivery.",
           category: "Health",
           video_url: ""
+        },
+        {
+          id: 22,
+          title: "GROUP WORKSHED SCHEME",
+          description: "Facilitate the establishment of worksheds for shuttleless looms in new or existing clusters to achieve economies of scale.\nOrganize powerloom units to provide better working conditions and boost efficiency for global competitiveness.",
+          benefits: "Maximum Admissible Area: 400 sq.ft per shuttleless loom, 40% of loom area for weaving preparatory, and 125 sq.ft per person for dormitories.\nSubsidy Details: General – 40% (₹400/sq.ft), SC – 75% (₹750/sq.ft), ST – 90% (₹900/sq.ft).",
+          eligibility_criteria: "The group must consist of at least 4 weavers or entrepreneurs, each with a separate legal entity.\nA minimum of 24 shuttleless looms (up to 230 cm) or 16 wider looms (230 cm and above) must be installed, with each beneficiary owning at least 4 looms.\nOnly TUFS-compatible machinery is eligible for installation under the scheme.",
+          application_process: "Application Mode: Offline, with advertisements published in newspapers for scheme announcements.\nDocuments Required: Beneficiaries must provide documents/information as requested by the Textile Commissioner, who may inspect units to ensure proper scheme implementation.\nObtain Application Form: Get the form from the Textile Commissioner's office or other designated centers.\nPrepare Documents: Gather required documents like registration details, loom ownership, and TUFS-compatible machinery proof.\nSubmit Application: Submit the completed form and documents within the deadline.\nInspection & Follow-up: The Textile Commissioner may request additional info or inspect the unit.",
+          category: "Business",
+          video_url: ""
         }
         
     ];
@@ -287,3 +297,5 @@ async function updateSchemes() {
 }
 
 updateSchemes();
+
+export default schemes;
