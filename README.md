@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/SchemeSeva.jpeg" alt="SchemeSeva Logo" width="400" height="400"/>
+  <img src="assets/images/SchemeSeva.jpeg" alt="SchemeSeva Logo" width="600" height="300"/>
 </p>
 
 # SchemeSeva
