@@ -74,7 +74,20 @@ export default function Dashboard() {
       if (error) throw error;
       const countsObj: Record<string, number> = {};
       (data as { category: string }[]).forEach((row) => {
-        countsObj[row.category] = (countsObj[row.category] || 0) + 1;
+        // Map the database category to the display category
+        let displayCategory = row.category;
+        if (row.category === "Agriculture") {
+          displayCategory = "Agriculture,Rural & Environment";
+        } else if (row.category === "Banking") {
+          displayCategory = "Banking,Financial Services and Insurance";
+        } else if (row.category === "Business") {
+          displayCategory = "Business & Entrepreneurship";
+        } else if (row.category === "Education") {
+          displayCategory = "Education & Learning";
+        } else if (row.category === "Health") {
+          displayCategory = "Health & Wellness";
+        }
+        countsObj[displayCategory] = (countsObj[displayCategory] || 0) + 1;
       });
       setCounts(countsObj);
     } catch (error) {
@@ -99,7 +112,10 @@ export default function Dashboard() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      contentContainerStyle={{ flexGrow: 1 }}
+      contentContainerStyle={{
+        flexGrow: 1,
+        backgroundColor: theme.colors.background,
+      }}
     >
       <Text style={styles.heading}>Find schemes based{"\n"}on categories</Text>
       <View style={styles.grid}>

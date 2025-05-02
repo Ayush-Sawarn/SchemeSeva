@@ -1,10 +1,17 @@
-import {StyleSheet,View,Image,Dimensions,Pressable,ScrollView} from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  Dimensions,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { Button, Text, Appbar } from "react-native-paper";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
-const CARD_SIZE = width * 0.35;
+const CARD_SIZE = width * 0.25;
 
 const flowSteps = [
   {
@@ -99,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#333333",
   },
   header: {
-    backgroundColor: "#1B5E20",
+    backgroundColor: "#333333",
     elevation: 4,
     height: 64,
     flexDirection: "row",
@@ -107,8 +114,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   navLogo: {
-    width: 50,
-    height: 50,
+    width: 106,
+    height: 113,
+    alignSelf: "auto",
   },
   navTitle: {
     fontSize: 22,
@@ -139,7 +147,7 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_SIZE,
     height: CARD_SIZE,
-    backgroundColor: "#2E7D32",
+    backgroundColor: "#333333",
     borderRadius: 12,
     padding: width * 0.02,
     justifyContent: "center",
@@ -147,11 +155,11 @@ const styles = StyleSheet.create({
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: {
-      width: 0,
-      height: 2,
+      width: 1,
+      height: 10,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.95,
+    shadowRadius: 9.84,
   },
   cardText: {
     fontSize: Math.min(width * 0.04, 20),

@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
-import { Text, Card, ActivityIndicator } from 'react-native-paper';
-import { useLocalSearchParams } from 'expo-router';
-import { supabase } from '../../../lib/supabase';
-import { ResizeMode, Video } from 'expo-av';
+import { useEffect, useState, useRef } from "react";
+import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
+import { Text, Card, ActivityIndicator } from "react-native-paper";
+import { useLocalSearchParams } from "expo-router";
+import { supabase } from "../../../lib/supabase";
+import { ResizeMode, Video } from "expo-av";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 type SchemeDetails = {
   id: string;
@@ -32,15 +32,15 @@ export default function SchemeDetails() {
   const fetchSchemeDetails = async () => {
     try {
       const { data, error } = await supabase
-        .from('schemes')
-        .select('*')
-        .eq('id', id)
+        .from("schemes")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (error) throw error;
       setScheme(data);
     } catch (error) {
-      console.error('Error fetching scheme details:', error);
+      console.error("Error fetching scheme details:", error);
     } finally {
       setLoading(false);
     }
@@ -73,11 +73,11 @@ export default function SchemeDetails() {
             useNativeControls
             resizeMode={ResizeMode.CONTAIN}
             isLooping={false}
-            onPlaybackStatusUpdate={status => setVideoStatus(() => status)}
+            onPlaybackStatusUpdate={(status) => setVideoStatus(() => status)}
           />
         </View>
       )}
-      
+
       <Card style={styles.card}>
         <Card.Content>
           <Text variant="titleLarge" style={styles.title}>
@@ -115,16 +115,16 @@ export default function SchemeDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#23262B",
   },
   videoContainer: {
     width: width,
     height: width * 0.56, // 16:9 aspect ratio
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   video: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   card: {
     margin: 16,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
