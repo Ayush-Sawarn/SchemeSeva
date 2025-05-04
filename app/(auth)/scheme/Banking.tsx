@@ -1,8 +1,9 @@
+import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
 import { Text, Card, ActivityIndicator, Searchbar } from "react-native-paper";
 import { supabase } from "../../../lib/supabase";
-import { Video, ResizeMode } from "expo-av";
+import { Video, ResizeMode, AVPlaybackStatus } from "expo-av";
 
 const { width } = Dimensions.get("window");
 
@@ -10,6 +11,8 @@ export default function BankingCategory() {
   const [schemes, setSchemes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const videoRef = useRef<any>(null);
+  const [videoStatus, setVideoStatus] = useState<AVPlaybackStatus | null>(null);
 
   useEffect(() => {
     fetchSchemes();
@@ -63,22 +66,47 @@ export default function BankingCategory() {
                   useNativeControls
                   resizeMode={ResizeMode.CONTAIN}
                   isLooping={false}
+                  onPlaybackStatusUpdate={(status) => {
+                    if (status) {
+                      setVideoStatus(status);
+                    }
+                  }}
                 />
               </View>
             )}
             <Card.Content>
               <Text style={styles.title}>{scheme.title}</Text>
               <Text style={styles.category}>{scheme.category}</Text>
-              <Text style={styles.description}>{scheme.description}</Text>
+              <Text style={styles.description}>
+                {typeof scheme.description === "string"
+                  ? scheme.description
+                  : Array.isArray(scheme.description)
+                  ? scheme.description.join("\n")
+                  : String(scheme.description)}
+              </Text>
               <Text style={styles.sectionTitle}>Eligibility Criteria</Text>
               <Text style={styles.sectionText}>
-                {scheme.eligibility_criteria}
+                {typeof scheme.eligibility_criteria === "string"
+                  ? scheme.eligibility_criteria
+                  : Array.isArray(scheme.eligibility_criteria)
+                  ? scheme.eligibility_criteria.join("\n")
+                  : String(scheme.eligibility_criteria)}
               </Text>
               <Text style={styles.sectionTitle}>Benefits</Text>
-              <Text style={styles.sectionText}>{scheme.benefits}</Text>
+              <Text style={styles.sectionText}>
+                {typeof scheme.benefits === "string"
+                  ? scheme.benefits
+                  : Array.isArray(scheme.benefits)
+                  ? scheme.benefits.join("\n")
+                  : String(scheme.benefits)}
+              </Text>
               <Text style={styles.sectionTitle}>How to Apply</Text>
               <Text style={styles.sectionText}>
-                {scheme.application_process}
+                {typeof scheme.application_process === "string"
+                  ? scheme.application_process
+                  : Array.isArray(scheme.application_process)
+                  ? scheme.application_process.join("\n")
+                  : String(scheme.application_process)}
               </Text>
             </Card.Content>
           </Card>

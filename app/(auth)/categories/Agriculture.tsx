@@ -1,17 +1,21 @@
-import { useEffect, useState, useRef } from "react";
+import * as React from "react";
 import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
 import { Text, Card, ActivityIndicator, Searchbar } from "react-native-paper";
 import { supabase } from "../../../lib/supabase";
-import { Video, ResizeMode } from "expo-av";
+import { Video, ResizeMode, AVPlaybackStatus } from "expo-av";
 
 const { width } = Dimensions.get("window");
 
-export default function AgricultureCategory() {
-  const [schemes, setSchemes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+const AgricultureCategory: React.FC = () => {
+  const [schemes, setSchemes] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const videoRef = React.useRef<any>(null);
+  const [videoStatus, setVideoStatus] = React.useState<AVPlaybackStatus | null>(
+    null
+  );
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchSchemes();
   }, []);
 
@@ -63,22 +67,47 @@ export default function AgricultureCategory() {
                   useNativeControls
                   resizeMode={ResizeMode.CONTAIN}
                   isLooping={false}
+                  onPlaybackStatusUpdate={(status) => {
+                    if (status) {
+                      setVideoStatus(status);
+                    }
+                  }}
                 />
               </View>
             )}
             <Card.Content>
               <Text style={styles.title}>{scheme.title}</Text>
               <Text style={styles.category}>{scheme.category}</Text>
-              <Text style={styles.description}>{scheme.description}</Text>
+              <Text style={styles.description}>
+                {typeof scheme.description === "string"
+                  ? scheme.description
+                  : Array.isArray(scheme.description)
+                  ? scheme.description.join("\n")
+                  : String(scheme.description)}
+              </Text>
               <Text style={styles.sectionTitle}>Eligibility Criteria</Text>
               <Text style={styles.sectionText}>
-                {scheme.eligibility_criteria}
+                {typeof scheme.eligibility_criteria === "string"
+                  ? scheme.eligibility_criteria
+                  : Array.isArray(scheme.eligibility_criteria)
+                  ? scheme.eligibility_criteria.join("\n")
+                  : String(scheme.eligibility_criteria)}
               </Text>
               <Text style={styles.sectionTitle}>Benefits</Text>
-              <Text style={styles.sectionText}>{scheme.benefits}</Text>
+              <Text style={styles.sectionText}>
+                {typeof scheme.benefits === "string"
+                  ? scheme.benefits
+                  : Array.isArray(scheme.benefits)
+                  ? scheme.benefits.join("\n")
+                  : String(scheme.benefits)}
+              </Text>
               <Text style={styles.sectionTitle}>How to Apply</Text>
               <Text style={styles.sectionText}>
-                {scheme.application_process}
+                {typeof scheme.application_process === "string"
+                  ? scheme.application_process
+                  : Array.isArray(scheme.application_process)
+                  ? scheme.application_process.join("\n")
+                  : String(scheme.application_process)}
               </Text>
             </Card.Content>
           </Card>
@@ -86,7 +115,9 @@ export default function AgricultureCategory() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default AgricultureCategory;
 
 const styles = StyleSheet.create({
   container: {
@@ -96,55 +127,49 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     margin: 16,
-    borderRadius: 12,
   },
   list: {
     padding: 16,
   },
   card: {
-    marginBottom: 24,
-    borderRadius: 12,
-    backgroundColor: "#1E1E1E",
-    elevation: 4,
-  },
-  videoContainer: {
-    width: width - 64,
-    height: (width - 64) * 0.56,
-    backgroundColor: "#000",
-    alignSelf: "center",
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    overflow: "hidden",
-  },
-  video: {
-    width: "100%",
-    height: "100%",
+    marginBottom: 16,
+    backgroundColor: "#2C2F35",
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 4,
+    marginBottom: 8,
+    color: "#FFFFFF",
   },
   category: {
-    opacity: 0.7,
+    fontSize: 14,
+    color: "#81C784",
     marginBottom: 8,
-    color: "#fff",
   },
   description: {
-    color: "#fff",
-    opacity: 0.85,
-    marginBottom: 8,
+    fontSize: 14,
+    color: "#FFFFFF",
+    marginBottom: 16,
   },
   sectionTitle: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#fff",
-    marginTop: 8,
+    marginTop: 16,
+    marginBottom: 8,
+    color: "#FFFFFF",
   },
   sectionText: {
-    color: "#fff",
-    opacity: 0.85,
-    marginBottom: 4,
+    fontSize: 14,
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  videoContainer: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+    marginBottom: 16,
+  },
+  video: {
+    flex: 1,
   },
   centered: {
     flex: 1,

@@ -9,18 +9,31 @@ import {
   ScrollView,
 } from "react-native";
 import {
-  Text,
   Card,
   Searchbar,
   ActivityIndicator,
   IconButton,
   useTheme,
-  Button,
 } from "react-native-paper";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../contexts/auth";
-import ChatBot from "../components/ChatBot";
+import React from "react";
+import { Text, Button } from "../../app/safe-components";
+
+const safeText = (value: any): string => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.join(", ");
+
+  // Check for React elements
+  if (value && typeof value === "object" && value.$$typeof) {
+    console.error("React element found in dashboard data:", value);
+    return "[React Element]";
+  }
+
+  return String(value);
+};
 
 const categories = [
   {
@@ -61,7 +74,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { signOut } = useAuth();
-  const [isChatBotVisible, setChatBotVisible] = useState(false);
 
   useEffect(() => {
     fetchCounts();
@@ -109,44 +121,78 @@ export default function Dashboard() {
     );
   }
 
-  return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      contentContainerStyle={{
-        flexGrow: 1,
-        backgroundColor: theme.colors.background,
-      }}
-    >
-      <Text style={styles.heading}>Find schemes based{"\n"}on categories</Text>
-      <View style={styles.grid}>
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat.key}
-            style={styles.categoryCard}
-            onPress={() => {
-              if (cat.key === "agriculture") {
-                router.push("/scheme/Agriculture" as never);
-              } else if (cat.key === "banking") {
-                router.push("/scheme/Banking" as never);
-              } else if (cat.key === "business") {
-                router.push("/scheme/Business" as never);
-              } else if (cat.key === "education") {
-                router.push("/scheme/Education" as never);
-              } else if (cat.key === "health") {
-                router.push("/scheme/Health" as never);
-              }
-            }}
-          >
-            <Image source={cat.image} style={styles.categoryIcon} />
-            <Text style={[styles.count, { color: cat.color }]}>
-              {(counts[cat.label] || 0) + " Schemes"}
-            </Text>
-            <Text style={styles.categoryLabel}>{cat.label}</Text>
-          </TouchableOpacity>
-        ))}
+  try {
+    return (
+      <ScrollView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={{
+          flexGrow: 1,
+          backgroundColor: theme.colors.background,
+        }}
+      >
+        <Text style={styles.heading}>Find schemes based on categories</Text>
+        <View style={styles.grid}>
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat.key}
+              style={styles.categoryCard}
+              onPress={() => {
+                try {
+                  if (cat.key === "agriculture") {
+                    router.push("/scheme/Agriculture" as never);
+                  } else if (cat.key === "banking") {
+                    router.push("/scheme/Banking" as never);
+                  } else if (cat.key === "business") {
+                    router.push("/scheme/Business" as never);
+                  } else if (cat.key === "education") {
+                    router.push("/scheme/Education" as never);
+                  } else if (cat.key === "health") {
+                    router.push("/scheme/Health" as never);
+                  }
+                } catch (e) {
+                  console.warn("Navigation error:", e);
+                }
+              }}
+            >
+              <Image source={cat.image} style={styles.categoryIcon} />
+              <Text style={styles.categoryCount}>
+                {typeof counts[cat.label] === "number" ? counts[cat.label] : 0}{" "}
+                Schemes
+              </Text>
+              <Text style={styles.categoryLabel}>{safeText(cat.label)}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Button
+          contentStyle={styles.buttonContent}
+          style={styles.button}
+          icon="magnify"
+          mode="contained"
+          onPress={() => {
+            try {
+              router.push("/schemes" as never);
+            } catch (e) {
+              console.warn("Navigation error:", e);
+            }
+          }}
+        >
+          Find schemes based on categories
+        </Button>
+      </ScrollView>
+    );
+  } catch (e) {
+    console.error("Dashboard render error:", e);
+    return (
+      <View
+        style={[
+          styles.container,
+          { alignItems: "center", justifyContent: "center" },
+        ]}
+      >
+        <Text>Something went wrong. Please restart the app.</Text>
       </View>
-    </ScrollView>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -183,7 +229,7 @@ const styles = StyleSheet.create({
     height: 80,
     marginBottom: 10,
   },
-  count: {
+  categoryCount: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
@@ -203,5 +249,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  buttonContent: {
+    padding: 10,
+  },
+  button: {
+    marginTop: 20,
+    marginHorizontal: 20,
   },
 });

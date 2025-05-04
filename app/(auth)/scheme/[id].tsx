@@ -1,9 +1,11 @@
+import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
-import { Text, Card, ActivityIndicator } from "react-native-paper";
+import { Card, ActivityIndicator } from "react-native-paper";
 import { useLocalSearchParams } from "expo-router";
 import { supabase } from "../../../lib/supabase";
-import { ResizeMode, Video } from "expo-av";
+import { ResizeMode, Video, AVPlaybackStatus } from "expo-av";
+import { Text } from "../../../app/safe-components";
 
 const { width } = Dimensions.get("window");
 
@@ -23,7 +25,7 @@ export default function SchemeDetails() {
   const [scheme, setScheme] = useState<SchemeDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const videoRef = useRef(null);
-  const [videoStatus, setVideoStatus] = useState({});
+  const [videoStatus, setVideoStatus] = useState<AVPlaybackStatus | null>(null);
 
   useEffect(() => {
     fetchSchemeDetails();
@@ -38,6 +40,21 @@ export default function SchemeDetails() {
         .single();
 
       if (error) throw error;
+
+      // Ensure all fields are strings before setting state
+      if (data) {
+        Object.keys(data).forEach((key) => {
+          if (
+            data[key] &&
+            typeof data[key] === "object" &&
+            !Array.isArray(data[key])
+          ) {
+            console.warn(`Converting object to string in field: ${key}`);
+            data[key] = JSON.stringify(data[key]);
+          }
+        });
+      }
+
       setScheme(data);
     } catch (error) {
       console.error("Error fetching scheme details:", error);
@@ -57,17 +74,30 @@ export default function SchemeDetails() {
   if (!scheme) {
     return (
       <View style={styles.centered}>
-        <Text>Scheme not found</Text>
+        <Text variant="bodyMedium">Scheme not found</Text>
       </View>
     );
   }
+
+  const safeText = (value: any): string => {
+    if (value === null || value === undefined) return "";
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.join("\n");
+
+    // Check for React elements
+    if (value && typeof value === "object" && value.$$typeof) {
+      console.error("React element found in scheme data:", value);
+      return "[React Element]";
+    }
+
+    return String(value);
+  };
 
   return (
     <ScrollView style={styles.container}>
       {scheme.video_url && (
         <View style={styles.videoContainer}>
           <Video
-            ref={videoRef}
             style={styles.video}
             source={{ uri: scheme.video_url }}
             useNativeControls
@@ -80,31 +110,43 @@ export default function SchemeDetails() {
 
       <Card style={styles.card}>
         <Card.Content>
-          <Text variant="titleLarge" style={styles.title}>
-            {scheme.title}
+          <Text style={styles.title}>
+            {typeof scheme.title === "string" ? scheme.title : ""}
           </Text>
-          <Text variant="bodySmall" style={styles.category}>
-            {scheme.category}
+          <Text style={styles.category}>
+            {typeof scheme.category === "string" ? scheme.category : ""}
           </Text>
 
           <View style={styles.section}>
-            <Text variant="titleMedium">Description</Text>
-            <Text variant="bodyMedium">{scheme.description}</Text>
+            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.sectionText}>
+              {typeof scheme.description === "string" ? scheme.description : ""}
+            </Text>
           </View>
 
           <View style={styles.section}>
-            <Text variant="titleMedium">Eligibility Criteria</Text>
-            <Text variant="bodyMedium">{scheme.eligibility_criteria}</Text>
+            <Text style={styles.sectionTitle}>Eligibility Criteria</Text>
+            <Text style={styles.sectionText}>
+              {typeof scheme.eligibility_criteria === "string"
+                ? scheme.eligibility_criteria
+                : ""}
+            </Text>
           </View>
 
           <View style={styles.section}>
-            <Text variant="titleMedium">Benefits</Text>
-            <Text variant="bodyMedium">{scheme.benefits}</Text>
+            <Text style={styles.sectionTitle}>Benefits</Text>
+            <Text style={styles.sectionText}>
+              {typeof scheme.benefits === "string" ? scheme.benefits : ""}
+            </Text>
           </View>
 
           <View style={styles.section}>
-            <Text variant="titleMedium">How to Apply</Text>
-            <Text variant="bodyMedium">{scheme.application_process}</Text>
+            <Text style={styles.sectionTitle}>How to Apply</Text>
+            <Text style={styles.sectionText}>
+              {typeof scheme.application_process === "string"
+                ? scheme.application_process
+                : ""}
+            </Text>
           </View>
         </Card.Content>
       </Card>
@@ -139,6 +181,12 @@ const styles = StyleSheet.create({
   section: {
     marginTop: 16,
     gap: 8,
+  },
+  sectionTitle: {
+    fontWeight: "bold",
+  },
+  sectionText: {
+    marginTop: 8,
   },
   centered: {
     flex: 1,

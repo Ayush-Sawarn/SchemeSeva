@@ -3,12 +3,23 @@ import {
   View,
   Image,
   Dimensions,
-  Pressable,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
-import { Button, Text, Appbar } from "react-native-paper";
-import { Link } from "expo-router";
+import { Appbar } from "react-native-paper";
+import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import React from "react";
+import { Text, SafePressable as Pressable } from "./safe-components";
+
+// Add a simple safe stringify function to handle objects
+const safeStringify = (value: any): string => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean")
+    return String(value);
+  return String(value); // Convert objects to strings safely
+};
 
 const { width, height } = Dimensions.get("window");
 const CARD_SIZE = width * 0.25;
@@ -35,7 +46,7 @@ function FlowChart() {
   return (
     <View style={styles.flowContainer}>
       {flowSteps.map((step, idx) => (
-        <View key={step.title} style={styles.Flowcard}>
+        <View key={idx} style={styles.Flowcard}>
           <View style={styles.iconWrap}>
             <Image
               source={step.icon}
@@ -43,8 +54,8 @@ function FlowChart() {
               resizeMode="contain"
             />
           </View>
-          <Text style={styles.cardTitle}>{step.title}</Text>
-          <Text style={styles.cardDesc}>{step.desc}</Text>
+          <Text style={styles.cardTitle}>{safeStringify(step.title)}</Text>
+          <Text style={styles.cardDesc}>{safeStringify(step.desc)}</Text>
           {idx < flowSteps.length - 1 && <Text style={styles.arrow}>↓</Text>}
         </View>
       ))}
@@ -73,17 +84,19 @@ export default function Welcome() {
           />
 
           <View style={styles.buttonContainer}>
-            <Link href="/auth/signup" asChild>
-              <Pressable style={styles.card}>
-                <Text style={styles.cardText}>SIGN UP</Text>
-              </Pressable>
-            </Link>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push("/auth/signup" as never)}
+            >
+              <Text style={styles.cardText}>SIGN UP</Text>
+            </TouchableOpacity>
 
-            <Link href="/auth/login" asChild>
-              <Pressable style={styles.card}>
-                <Text style={styles.cardText}>LOG IN</Text>
-              </Pressable>
-            </Link>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push("/auth/login" as never)}
+            >
+              <Text style={styles.cardText}>LOG IN</Text>
+            </TouchableOpacity>
           </View>
         </View>
 

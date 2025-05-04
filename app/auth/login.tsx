@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { StyleSheet, View, Alert } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
-import { Link, router } from "expo-router";
+import { StyleSheet, View, Alert, TouchableOpacity } from "react-native";
+import { TextInput } from "react-native-paper";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../contexts/auth";
 import { supabase } from "../../lib/supabase";
+import { Text, Button } from "../safe-components";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
@@ -32,7 +33,7 @@ export default function Login() {
       if (error) throw error;
 
       await signIn();
-      router.replace("/dashboard");
+      router.replace("/dashboard" as never);
     } catch (error: any) {
       if (error.message === "Invalid login credentials") {
         Alert.alert("Error", "Invalid phone number or password.");
@@ -81,9 +82,11 @@ export default function Login() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
-          <Link href="/auth/signup">
+          <TouchableOpacity
+            onPress={() => router.push("/auth/signup" as never)}
+          >
             <Text style={styles.link}>Sign Up</Text>
-          </Link>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

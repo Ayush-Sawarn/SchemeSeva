@@ -129,9 +129,9 @@ const schemes = [
         benefits: 
           "Financial aid up to Rs. 1 lakh.\nApplicable for both online and offline coaching.\nCovers various competitive exams.\nBudget provision of Rs. 5 crore.\nSupport for students aiming for professional and government sectors."
         ,
-        application_process: [
+        application_process: 
           "Visit the Department of Higher Education, Himachal Pradesh website.\nFill out the application form.\nAttach necessary documents like certificates and Bonafide certificate.\nSubmit the application before the deadline.\nWait for confirmation and further instructions."
-        ],
+        ,
         category: "Education",
         video_url: ""
       },
