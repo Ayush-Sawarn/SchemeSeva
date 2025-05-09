@@ -95,6 +95,8 @@ export function EmergencyScreen() {
   );
 }
 
+export default EmergencyScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

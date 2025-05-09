@@ -1,7 +1,7 @@
-import { Redirect, Stack } from "expo-router";
+import { Redirect, Slot } from "expo-router";
 import { useAuth } from "../../contexts/auth";
 import { ActivityIndicator } from "react-native-paper";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 export default function AuthLayout() {
   const { user, loading } = useAuth();
@@ -9,7 +9,7 @@ export default function AuthLayout() {
   // Show loading screen while checking authentication
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={styles.container} pointerEvents="box-none">
         <ActivityIndicator size="large" />
       </View>
     );
@@ -20,22 +20,14 @@ export default function AuthLayout() {
     return <Redirect href="/" />;
   }
 
-  return (
-    <Stack>
-      <Stack.Screen
-        name="dashboard"
-        options={{
-          title: "Dashboard",
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="scheme/[id]"
-        options={{
-          title: "Scheme Details",
-          headerShown: true,
-        }}
-      />
-    </Stack>
-  );
+  // Render child routes!
+  return <Slot />;
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

@@ -1,9 +1,16 @@
 import React from "react";
 import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
-import { Text, Card, ActivityIndicator, Searchbar } from "react-native-paper";
+import {
+  Text,
+  Card,
+  ActivityIndicator,
+  Searchbar,
+  Button,
+} from "react-native-paper";
 import { supabase } from "../../../lib/supabase";
 import { Video, ResizeMode, AVPlaybackStatus } from "expo-av";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -49,6 +56,13 @@ export default function BusinessCategory() {
 
   return (
     <View style={styles.container}>
+      <Button
+        mode="outlined"
+        style={{ margin: 16 }}
+        onPress={() => router.push("/video-search" as never)}
+      >
+        Search for a Scheme Video
+      </Button>
       <Searchbar
         placeholder="Search schemes..."
         onChangeText={setSearchQuery}
@@ -133,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 12,
     backgroundColor: "#1E1E1E",
-    elevation: 4,
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   },
   videoContainer: {
     width: width - 64,

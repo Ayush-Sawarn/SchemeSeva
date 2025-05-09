@@ -10,15 +10,19 @@ import { Appbar } from "react-native-paper";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
-import { Text, SafePressable as Pressable } from "./safe-components";
+import { SafeText as Text, SafePressable as Pressable } from "./components";
 
-// Add a simple safe stringify function to handle objects
-const safeStringify = (value: any): string => {
+// Helper function to safely convert any value to string
+const safeToString = (value: any): string => {
   if (value === null || value === undefined) return "";
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean")
+  if (typeof value === "string" || typeof value === "number")
     return String(value);
-  return String(value); // Convert objects to strings safely
+  if (React.isValidElement(value)) return "[React Element]";
+  try {
+    return String(value);
+  } catch (e) {
+    return "[object]";
+  }
 };
 
 const { width, height } = Dimensions.get("window");
@@ -42,20 +46,16 @@ const flowSteps = [
   },
 ];
 
-function FlowChart() {
+export function FlowChart() {
   return (
     <View style={styles.flowContainer}>
       {flowSteps.map((step, idx) => (
         <View key={idx} style={styles.Flowcard}>
           <View style={styles.iconWrap}>
-            <Image
-              source={step.icon}
-              style={styles.icon}
-              resizeMode="contain"
-            />
+            <Image source={step.icon} style={styles.icon} />
           </View>
-          <Text style={styles.cardTitle}>{safeStringify(step.title)}</Text>
-          <Text style={styles.cardDesc}>{safeStringify(step.desc)}</Text>
+          <Text style={styles.cardTitle}>{safeToString(step.title)}</Text>
+          <Text style={styles.cardDesc}>{safeToString(step.desc)}</Text>
           {idx < flowSteps.length - 1 && <Text style={styles.arrow}>↓</Text>}
         </View>
       ))}
@@ -71,7 +71,6 @@ export default function Welcome() {
           <Image
             source={require("../assets/images/SchemeSeva.jpeg")}
             style={styles.navLogo}
-            resizeMode="contain"
           />
           <Text style={styles.navTitle}>SchemeSeva</Text>
         </Appbar.Header>
@@ -80,7 +79,6 @@ export default function Welcome() {
           <Image
             source={require("../assets/images/welcome.jpg")}
             style={styles.welcomeImage}
-            resizeMode="contain"
           />
 
           <View style={styles.buttonContainer}>
@@ -120,19 +118,20 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#333333",
-    elevation: 4,
-    height: 64,
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+    height: 96,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 16,
+    alignItems: "center",
   },
   navLogo: {
-    width: 106,
-    height: 113,
+    width: 186,
+    height: 94,
     alignSelf: "auto",
   },
   navTitle: {
-    fontSize: 22,
+    fontSize: 44,
     fontWeight: "bold",
     color: "#FFFFFF",
     alignSelf: "center",
@@ -143,9 +142,9 @@ const styles = StyleSheet.create({
   },
   welcomeImage: {
     width: "100%",
-    aspectRatio: 16 / 9,
+    aspectRatio: 2.5,
+    maxHeight: 520,
     height: undefined,
-    resizeMode: "contain",
     backgroundColor: "#333333",
   },
   buttonContainer: {
@@ -158,26 +157,16 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   card: {
-    width: CARD_SIZE,
-    height: CARD_SIZE,
-    backgroundColor: "#333333",
-    borderRadius: 12,
-    padding: width * 0.02,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 10,
-    },
-    shadowOpacity: 0.95,
-    shadowRadius: 9.84,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginVertical: 8,
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   },
   cardText: {
     fontSize: Math.min(width * 0.04, 20),
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#333333",
     textAlign: "center",
   },
   flowContainer: {
@@ -193,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     width: "90%",
     alignItems: "center",
-    elevation: 2,
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
   },
   iconWrap: {
     height: 64,
@@ -230,7 +219,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    color: "#b0b8d1", // light indigo/gray
+    color: "#b0b8d1",
     textAlign: "center",
     marginBottom: 2,
   },

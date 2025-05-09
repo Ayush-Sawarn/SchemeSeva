@@ -1,58 +1,66 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false, error: null };
+  public state: State = {
+    hasError: false,
+    error: null,
+    errorInfo: null
+  };
+
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo);
+    this.setState({
+      error,
+      errorInfo
+    });
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("ErrorBoundary caught an error:", error.message);
-    console.error(errorInfo);
-  }
+  private handleRetry = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null
+    });
+  };
 
-  render() {
+  public render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
-      const errorMessage = this.state.error?.message || "Unknown error";
-
-      if (errorMessage.includes("Objects are not valid as a React child")) {
-        return (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle}>React Child Error</Text>
-            <Text style={styles.errorMessage}>{errorMessage}</Text>
-            <Text style={styles.errorHint}>
-              This usually happens when a React component is directly used where
-              only text should be. Check your Text components to make sure they
-              only contain strings or other Text components.
-            </Text>
-          </View>
-        );
-      }
-
-      // Default fallback
       return (
-        this.props.fallback || (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle}>Something went wrong</Text>
-            <Text style={styles.errorMessage}>{errorMessage}</Text>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Something went wrong</Text>
+            <Text style={styles.message}>
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </Text>
+            {Platform.OS === 'web' && this.state.errorInfo && (
+              <Text style={styles.stack}>
+                {this.state.errorInfo.componentStack}
+              </Text>
+            )}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={this.handleRetry}
+            >
+              <Text style={styles.buttonText}>Try again</Text>
+            </TouchableOpacity>
           </View>
-        )
+        </SafeAreaView>
       );
     }
 
@@ -61,27 +69,44 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  errorContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
-    backgroundColor: "#ffdddd",
-    borderRadius: 5,
-    margin: 10,
   },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#ff0000",
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 10,
+    color: '#333',
   },
-  errorMessage: {
-    fontSize: 14,
-    color: "#333",
-    marginBottom: 10,
+  message: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#666',
   },
-  errorHint: {
+  stack: {
     fontSize: 12,
-    color: "#666",
-    fontStyle: "italic",
+    color: '#999',
+    marginBottom: 20,
+    fontFamily: Platform.OS === 'web' ? 'monospace' : undefined,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

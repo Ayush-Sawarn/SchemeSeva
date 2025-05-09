@@ -1,6 +1,7 @@
 import React, { ReactElement, ReactNode } from "react";
 import { View, Platform } from "react-native";
 import { Slot } from "expo-router";
+import { AuthProvider } from "../contexts/auth";
 
 // SDK 52 specific patch for web React child errors
 if (Platform.OS === "web") {
@@ -55,12 +56,20 @@ if (Platform.OS === "web") {
   require("./debug-helper").default;
 }
 
+interface ErrorBoundaryProps {
+  type: 'error' | 'warning' | 'info';
+  props: Record<string, unknown>;
+  children: ReactNode[];
+}
+
 export default function RootLayout() {
   return (
-    <ErrorBoundary>
-      <View style={{ flex: 1 }}>
-        <Slot />
-      </View>
-    </ErrorBoundary>
+    <AuthProvider>
+      <ErrorBoundary>
+        <View style={{ flex: 1 }}>
+          <Slot />
+        </View>
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }

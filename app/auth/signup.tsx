@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -12,10 +12,11 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../contexts/auth";
 import { supabase } from "../../lib/supabase";
-import { Text, Button } from "../safe-components";
+import { SafeText as Text, SafeButton as Button } from "../../app/components";
 
 const { width } = Dimensions.get("window");
 const BUTTON_SIZE = width * 0.1;
+const OTP_RESEND_DELAY = 60; // seconds
 
 export default function SignUp() {
   const [phone, setPhone] = useState("");
@@ -24,13 +25,67 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"phone" | "otp" | "password">("phone");
+  const [resendTimer, setResendTimer] = useState(OTP_RESEND_DELAY);
+  const [canResend, setCanResend] = useState(false);
   const { signIn } = useAuth();
 
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval>;
+    if (step === "otp" && resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [step, resendTimer]);
+
+  const validatePhone = (phone: string) => {
+    return /^\d{10}$/.test(phone);
+  };
+
   const handleSendOtp = async () => {
-    if (!phone || phone.length !== 10) {
+    if (!validatePhone(phone)) {
       Alert.alert("Error", "Please enter a valid 10-digit phone number");
       return;
     }
+
+    setLoading(true);
+    try {
+      console.log("Sending OTP to:", `+91${phone}`);
+
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: `+91${phone}`,
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) {
+        console.error("OTP send error details:", error);
+        throw error;
+      }
+
+      setStep("otp");
+      setResendTimer(OTP_RESEND_DELAY);
+      setCanResend(false);
+      Alert.alert("Success", "OTP sent successfully");
+    } catch (error: any) {
+      console.error("OTP send error:", error);
+      let errorMessage = error?.message || "Failed to send OTP";
+      Alert.alert("Error", errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!canResend) return;
 
     setLoading(true);
     try {
@@ -39,10 +94,13 @@ export default function SignUp() {
       });
 
       if (error) throw error;
-      setStep("otp");
-      Alert.alert("Success", "OTP sent successfully");
+
+      setResendTimer(OTP_RESEND_DELAY);
+      setCanResend(false);
+      Alert.alert("Success", "OTP resent successfully");
     } catch (error: any) {
-      Alert.alert("Error", error?.message || "Failed to send OTP");
+      console.error("OTP resend error:", error);
+      Alert.alert("Error", error?.message || "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
@@ -67,6 +125,7 @@ export default function SignUp() {
 
       setStep("password");
     } catch (error: any) {
+      console.error("OTP verification error:", error?.message || error);
       Alert.alert("Error", error?.message || "Failed to verify OTP");
     } finally {
       setLoading(false);
@@ -95,6 +154,7 @@ export default function SignUp() {
       await signIn();
       router.replace("/dashboard" as never);
     } catch (error: any) {
+      console.error("Password set error:", error?.message || error);
       Alert.alert("Error", error?.message || "Failed to set password.");
     } finally {
       setLoading(false);
@@ -123,6 +183,18 @@ export default function SignUp() {
             >
               Verify OTP
             </Button>
+            <View style={styles.resendContainer}>
+              <Text style={styles.resendText}>
+                {canResend
+                  ? "Didn't receive OTP? "
+                  : `Resend OTP in ${resendTimer}s`}
+              </Text>
+              {canResend && (
+                <TouchableOpacity onPress={handleResendOtp} disabled={loading}>
+                  <Text style={styles.resendLink}>Resend</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Button
               onPress={() => setStep("phone")}
               disabled={loading}
@@ -250,10 +322,24 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: "#212121",
+    color: "#666",
   },
   link: {
-    color: "#303030",
+    color: "#007AFF",
     fontWeight: "bold",
+  },
+  resendContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  resendText: {
+    color: "#666",
+  },
+  resendLink: {
+    color: "#007AFF",
+    fontWeight: "bold",
+    marginLeft: 4,
   },
 });

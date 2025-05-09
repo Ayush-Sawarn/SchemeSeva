@@ -4,6 +4,10 @@ import os
 import re
 import tempfile
 from symspellpy.symspellpy import SymSpell, Verbosity
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 s3 = boto3.client('s3')
 
@@ -68,28 +72,50 @@ def merge_videos(paths, output_path):
     ], check=True)
 
 def upload_final(scheme_code, output_path):
-    s3.upload_file(output_path, "3final3", f"{scheme_code}_final.mp4")
+    s3.upload_file(
+        output_path,
+        "3final3",
+        f"{scheme_code}_final.mp4",
+        ExtraArgs={'ACL': 'public-read'}
+    )
+    url = f"https://3final3.s3.eu-north-1.amazonaws.com/{scheme_code}_final.mp4"
+    print(f"Uploaded video URL: {url}")
+    return url
 
-if __name__ == "__main__":
+# FastAPI app
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify ["http://localhost:8081"] for more security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/generate-video")
+async def generate_video(request: Request):
     try:
-        user_input = input("Enter your message about the scheme: ")
-        if not user_input.strip():
-            print({"error": "Missing user input"})
-        else:
-            scheme_code = identify_scheme(user_input)
-            if not scheme_code:
-                print({"error": "Could not match a scheme to your input"})
-            else:
-                print(f"Identified Scheme: {scheme_code}")  # <--- Display the selected scheme
-                input_files = download_videos(scheme_code)
-                final_output = os.path.join(tempfile.gettempdir(), f"{scheme_code}_final.mp4")
-                merge_videos(input_files, final_output)
-                upload_final(scheme_code, final_output)
-                print({
-                    "message": f"Final video for {scheme_code} uploaded successfully",
-                    "s3_url": f"s3://3final3/{scheme_code}_final.mp4"
-                })
+        data = await request.json()
+        user_input = data.get("user_input")
+        if not user_input or not user_input.strip():
+            return JSONResponse({"error": "Missing user input"}, status_code=400)
+        scheme_code = identify_scheme(user_input)
+        if not scheme_code:
+            return JSONResponse({"error": "Could not match a scheme to your input"}, status_code=404)
+        input_files = download_videos(scheme_code)
+        final_output = os.path.join(tempfile.gettempdir(), f"{scheme_code}_final.mp4")
+        merge_videos(input_files, final_output)
+        s3_url = upload_final(scheme_code, final_output)
+        return JSONResponse({
+            "message": f"Final video for {scheme_code} uploaded successfully",
+            "s3_url": s3_url
+        })
     except subprocess.CalledProcessError as e:
-        print({"error": f"FFmpeg failed: {e}"})
+        return JSONResponse({"error": f"FFmpeg failed: {e}"}, status_code=500)
     except Exception as e:
-        print({"error": str(e)})
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+# Uncomment below to run locally for testing
+if __name__ == "__main__":
+     uvicorn.run(app, host="0.0.0.0", port=8000)
