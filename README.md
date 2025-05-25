@@ -12,6 +12,32 @@ Every year, the government releases thousands of schemes and policies aimed at s
 
 **SchemeSeva** addresses this critical gap by providing a user-friendly platform that makes government schemes accessible and understandable to everyone, especially those who are less educated or have limited access to information. Our app not only lists the latest government schemes but also generates short, easy-to-understand videos in Hindi, ensuring the information reaches a wider audience in their native language.
 
+## Screenshots
+
+<p align="center">
+  <img src="assets/images/homepage.jpeg" alt="Homepage" width="300"/>
+  <br/>
+  <em>Homepage: Welcome screen of SchemeSeva</em>
+</p>
+
+<p align="center">
+  <img src="assets/images/dashboard.jpeg" alt="Dashboard" width="300"/>
+  <br/>
+  <em>Dashboard: Overview of available schemes and user options</em>
+</p>
+
+<p align="center">
+  <img src="assets/images/video1.jpeg" alt="Scheme Video Example 1" width="300"/>
+  <br/>
+  <em>Scheme Video Example 1: Video explaining a government scheme</em>
+</p>
+
+<p align="center">
+  <img src="assets/images/video2.jpeg" alt="Scheme Video Example 2" width="300"/>
+  <br/>
+  <em>Scheme Video Example 2: Another example of a scheme explainer video</em>
+</p>
+
 ## Key Features
 
 - **Latest Government Schemes:** Stay updated with the most recent schemes released by the government.
