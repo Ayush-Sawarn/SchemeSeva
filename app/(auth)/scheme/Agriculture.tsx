@@ -72,56 +72,15 @@ export default function AgricultureCategory() {
       <ScrollView contentContainerStyle={styles.list}>
         {filteredSchemes.map((scheme) => (
           <Card key={scheme.id} style={styles.card}>
-            {scheme.video_url && (
-              <View style={styles.videoContainer}>
-                <Video
-                  style={styles.video}
-                  source={{ uri: scheme.video_url }}
-                  useNativeControls
-                  resizeMode={ResizeMode.CONTAIN}
-                  isLooping={false}
-                  onPlaybackStatusUpdate={(status) => {
-                    if (status) {
-                      setVideoStatus(status);
-                    }
-                  }}
-                />
-              </View>
-            )}
             <Card.Content>
               <Text style={styles.title}>{scheme.title}</Text>
-              <Text style={styles.category}>{scheme.category}</Text>
-              <Text style={styles.description}>
-                {typeof scheme.description === "string"
-                  ? scheme.description
-                  : Array.isArray(scheme.description)
-                  ? scheme.description.join("\n")
-                  : String(scheme.description)}
-              </Text>
-              <Text style={styles.sectionTitle}>Eligibility Criteria</Text>
-              <Text style={styles.sectionText}>
-                {typeof scheme.eligibility_criteria === "string"
-                  ? scheme.eligibility_criteria
-                  : Array.isArray(scheme.eligibility_criteria)
-                  ? scheme.eligibility_criteria.join("\n")
-                  : String(scheme.eligibility_criteria)}
-              </Text>
-              <Text style={styles.sectionTitle}>Benefits</Text>
-              <Text style={styles.sectionText}>
-                {typeof scheme.benefits === "string"
-                  ? scheme.benefits
-                  : Array.isArray(scheme.benefits)
-                  ? scheme.benefits.join("\n")
-                  : String(scheme.benefits)}
-              </Text>
-              <Text style={styles.sectionTitle}>How to Apply</Text>
-              <Text style={styles.sectionText}>
-                {typeof scheme.application_process === "string"
-                  ? scheme.application_process
-                  : Array.isArray(scheme.application_process)
-                  ? scheme.application_process.join("\n")
-                  : String(scheme.application_process)}
-              </Text>
+              <Text style={styles.description}>{scheme.description}</Text>
+              <Text style={styles.label}>Eligibility:</Text>
+              <Text style={styles.content}>{scheme.eligibility_criteria}</Text>
+              <Text style={styles.label}>Benefits:</Text>
+              <Text style={styles.content}>{scheme.benefits}</Text>
+              <Text style={styles.label}>Application Process:</Text>
+              <Text style={styles.content}>{scheme.application_process}</Text>
             </Card.Content>
           </Card>
         ))}
@@ -165,10 +124,10 @@ const styles = StyleSheet.create({
     height: undefined,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   category: {
     opacity: 0.7,
@@ -178,10 +137,11 @@ const styles = StyleSheet.create({
   description: {
     color: "#fff",
     opacity: 0.85,
-    marginBottom: 8,
+    marginBottom: 16,
+    fontSize: 16,
+    lineHeight: 24,
   },
   sectionTitle: {
-    fontWeight: "bold",
     color: "#fff",
     marginTop: 8,
   },
@@ -195,5 +155,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#23262B",
+  },
+  label: {
+
+    color: "#fff",
+    marginTop: 16,
+    marginBottom: 8,
+    fontSize: 18,
+  },
+  content: {
+    color: "#fff",
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 16,
   },
 });

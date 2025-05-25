@@ -120,23 +120,7 @@ export default function SchemeDetails() {
   };
 
   const renderVideo = () => {
-    if (!state.schemes[0]?.video_url) return null;
-
-    return (
-      <View style={styles.videoContainer}>
-        <Video
-          ref={videoRef}
-          style={styles.video}
-          source={{ uri: state.schemes[0].video_url }}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          isLooping={false}
-          onPlaybackStatusUpdate={(status) =>
-            setState((prev) => ({ ...prev, videoStatus: status }))
-          }
-        />
-      </View>
-    );
+    return null;
   };
 
   if (state.loading && !state.schemes.length) {
@@ -157,7 +141,7 @@ export default function SchemeDetails() {
 
   return (
     <View style={styles.container}>
-      {renderVideo()}
+      {/* Video removed as per new requirements */}
       <FlatList
         data={state.schemes}
         renderItem={({ item }) => (

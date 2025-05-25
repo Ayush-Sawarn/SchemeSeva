@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   categoryCard: {
     width: 180,
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 60,
     marginHorizontal: 44,
   },
   categoryIcon: {

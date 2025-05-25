@@ -126,15 +126,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   navLogo: {
-    width: 186,
-    height: 94,
-    alignSelf: "auto",
+    width: 120,
+    height: 67,
+    alignSelf: "flex-start",
+    marginRight: 16,
   },
   navTitle: {
-    fontSize: 44,
+    fontSize: 27,
     fontWeight: "bold",
     color: "#FFFFFF",
     alignSelf: "center",
+    marginTop: -38,
   },
   content: {
     marginTop: -1,
