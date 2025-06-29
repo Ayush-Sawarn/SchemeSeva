@@ -38,6 +38,12 @@ Every year, the government releases thousands of schemes and policies aimed at s
   <em>Scheme Video Example 2: Another example of a scheme explainer video</em>
 </p>
 
+## Demo Video
+
+Watch our app in action! Check out the demo video to see SchemeSeva's features and functionality:
+
+**[📱 SchemeSeva Demo Video](https://drive.google.com/file/d/1euXTKYfxr92Sro-l8YkuwzYJS-NzR7dO/view?usp=sharing)**
+
 ## Key Features
 
 - **Latest Government Schemes:** Stay updated with the most recent schemes released by the government.
